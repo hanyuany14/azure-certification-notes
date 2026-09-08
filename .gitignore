@@ -1,0 +1,7 @@
+.DS_Store
+._*
+
+# Local editor and Python artifacts
+.obsidian/workspace.json
+__pycache__/
+*.py[cod]
