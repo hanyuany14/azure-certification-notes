@@ -4,15 +4,17 @@
 
 ## 1. Vision Workloads
 
-| Workload | Input → Output | 典型情境 |
+| Workload | Input → Output | 具體例子 |
 |---|---|---|
-| **Image Classification** | Image → Class / labels | 判斷整張圖片是貓、狗或鳥 |
-| **Object Detection** | Image → Classes＋bounding boxes | 找出每個物件及所在位置 |
-| **Segmentation** | Image → Pixel classes / masks | 標出物體的精確輪廓 |
-| **OCR / Read** | Image → Text＋location | 讀取照片中的印刷字或手寫字 |
-| **Image Analysis** | Image → Tags、caption、objects 等 | 描述與分析既有圖片 |
-| **Multimodal Vision** | Text＋images → Generated answer | 比較兩張圖片或回答圖片問題 |
-| **Image Generation** | Prompt＋可選原圖 → New / edited image | 產生插圖或修改圖片 |
+| **Image Classification** | Image → Class / labels | 輸入一張黃金獵犬的照片 → 判斷整張圖的類別是 `Dog` |
+| **Object Detection** | Image → Classes＋bounding boxes | 輸入一張有兩隻狗和一顆球的照片 → 找出 `Dog #1`、`Dog #2`、`Ball`，並為每個物件畫出 bounding box |
+| **Segmentation** | Image → Pixel classes / masks | 輸入一張狗站在草地上的照片 → 將屬於狗、草地與背景的 pixels 分別標示，得到精確輪廓或 mask |
+| **OCR / Read** | Image → Text＋location | 輸入一張寫有 `Total: $25.00` 的收據照片 → 讀出文字，並回傳文字在圖片中的位置 |
+| **Image Analysis** | Image → Tags、caption、objects 等 | 輸入一張狗在草地奔跑的照片 → 回傳 `dog`、`grass` 等 tags，以及 `A dog running on grass.` caption |
+| **Multimodal Vision** | Text＋images → Generated answer | 輸入一張冰箱內部照片並提問「可以做什麼料理？」→ 模型理解圖片內容後產生料理建議 |
+| **Image Generation** | Prompt＋可選原圖 → New / edited image | 輸入 `Generate a watercolor poster of a dog in a park.` → 產生一張新的水彩風格圖片；這項工作是生成圖片，不是從照片擷取資訊 |
+
+> **啾啾筆記：** Classification 看整張圖屬於哪一類；Object Detection 找出每個物件和位置；Segmentation 會細到每個 pixel；OCR 專門讀文字；Image Analysis 回傳 tags、caption 或 objects；Multimodal Vision 則可以針對圖片內容回答問題喔～
 
 ## 2. Core Concepts
 
@@ -58,7 +60,6 @@ flowchart TD
 | **API / capability** | 服務內呼叫哪項具體能力？ | Image Analysis、Read、Face Detect |
 | **Model** | 哪個部署模型處理輸入？ | Vision-capable model、image-generation model |
 
-> **Azure Vision vs Image Analysis：** **Azure Vision in Foundry Tools** 是上層視覺產品範圍；**Image Analysis** 是其中一組特定 API，回傳 tags、captions、objects 等結果。兩者不是同義詞，也不是兩個完全無關的服務。Image Analysis 3.2 / 4.0 API 正在退役，不代表 Azure Face、Document Intelligence、Content Understanding 或 Computer Vision 工作負載一起退休。
 
 ### Image Classification、Object Detection 與 Segmentation
 
@@ -71,10 +72,6 @@ flowchart TD
 | **Instance Segmentation** | 每個物件的 pixels | 每個 instance 的 mask | Cat #1 與 Cat #2 各有輪廓 |
 
 分類模型可能回傳多個 class scores；**Multiclass** 的重點是最終類別互斥，不代表只能回傳一個分數。
-
-![原始視覺任務投影片：分類、偵測與分割](../assets/knowledge/06_vision_tasks.png)
-
-> **原圖更正：**Classification、Detection 與 Segmentation 解決不同問題，不能因輸出更細就稱為 Accuracy 更高。正確比較是 **Label → Bounding box → Pixel class / instance mask** 的輸出粒度。
 
 ### Image Analysis
 
@@ -94,10 +91,6 @@ flowchart TD
 ### OCR / Read
 
 **Optical Character Recognition (OCR)** 從圖片中讀取印刷或手寫文字，常包含文字內容與位置資訊。
-
-```text
-Image → OCR / Read → Recognized text + location
-```
 
 OCR 只負責「讀到文字」。若題目還需要理解 invoice number、table、key-value pairs 或自訂 schema，應考慮 [Content Understanding](08_Content_Understanding.md) 或 Document Intelligence。
 
@@ -127,8 +120,6 @@ Face attributes → 臉的姿勢、遮擋與影像品質
 Identification / Verification → 是誰／是否為同一人
 ```
 
-> **生命週期提示：**Azure Face 為 **Limited access**。`emotion`、`gender` attributes 已 **Retired**；`age`、`smile`、facial hair、hair、makeup 屬受限能力。可回傳的 attribute 也會依 detection model、recognition model 與存取資格而異。Face attributes 是統計模型的預測結果，不應當作絕對事實或防偽依據；防偽應使用 Face Liveness。
-
 ### Multimodal Vision
 
 Vision-capable model 能在同一個 prompt 中接收文字與一張或多張圖片，再依問題產生文字回答。
@@ -142,13 +133,6 @@ Text instruction + image content parts → Vision-capable model → Text answer
 ### Image Generation
 
 Image-generation model 根據 prompt 建立新圖片；支援的模型也能以原圖和指示進行編輯。
-
-好的 prompt 可依序寫：**subject → action / scene → composition → style → constraints**。
-
-```text
-Create a clean product illustration of a reusable bottle,
-centered on a white background, with no text.
-```
 
 能理解圖片的 model 不一定能產生圖片；要分別確認 **vision input** 與 **image generation / editing** 能力。
 
@@ -244,61 +228,19 @@ image_bytes = base64.b64decode(result.data[0].b64_json)
 
 看圖使用 vision input；產圖使用 image-generation capability。兩種 API shape 不可直接互換。
 
-## 4. Current vs Legacy
+## 4. Image Analysis 3.2 Legacy｜舊題辨識
 
-### Current services
+這些是 **Image Analysis 3.2 舊題型** 不一定會正式考試出但是會在模擬考的時候出，可以稍微記一下：
 
-| Service / capability | Status | 快速理解 |
+| 3.2 legacy concept | 作用 | Example |
 |---|---|---|
-| **Multimodal vision models** | **Current** | 現行考綱重點：在 prompt 中解讀圖片 |
-| **Image-generation models** | **Current** | 現行考綱重點：建立新視覺輸出 |
-| **Azure Face** | **Current；limited access** | Face detection、identification、verification 等依資格與用途限制 |
-| **OCR workload** | **Current concept** | 舊 OCR endpoint 的生命週期不等於 OCR 技術本身退休 |
-| **Image Analysis 3.2 / 4.0 API** | **Deprecated / Retiring（2028-09-25）** | 現有客戶需依 migration guide 遷移 |
-| **Azure Custom Vision** | **Retiring（2028-09-25）** | 自訂分類／偵測概念仍可用於理解舊題 |
+| **Categories** | 將整張圖片歸入固定的 86-category taxonomy | `animal_dog`、`people_group` |
+| **Description** | 用自然語言描述圖片；現行題目較常看到 **Caption** | `A dog running on the grass.` |
+| **Brands** | 找出品牌／logo 與所在位置 | `Microsoft`＋bounding box |
+| **Image Type** | 判斷圖片是否為 clip art 或 line drawing | `clipArtType`、`lineDrawingType` |
+| **Domain-specific Models** | 辨識 Microsoft 預先定義的名人或地標 | `celebrities`、`landmarks` |
 
-### Legacy Image Analysis 3.2 capability map
-
-舊題常見的 Image Analysis features：
-
-| Legacy feature | Output / exam clue |
-|---|---|
-| **Tags** | 多個描述詞與 confidence |
-| **Categories** | 固定 86-category taxonomy |
-| **Description** | 自然語言圖片描述 |
-| **Objects** | Classes＋bounding boxes |
-| **Brands** | 品牌／logo 與位置 |
-| **Image Type** | Clip art／line drawing |
-| **Domain-specific Models** | Celebrities、landmarks |
-
-這些是舊 API 題型，不可直接當成現行 Image Analysis 4.0 或所有 multimodal models 的固定 feature 清單。
-
-### Tags vs Categories vs Domain-specific Models
-
-這三項都屬於 **Azure Vision Image Analysis** 的圖片理解功能；Categories 與 Domain-specific Models 是 **3.2 legacy** 題型。
-
-| Feature | 回答的問題 | Example | Version / service |
-|---|---|---|---|
-| **Tags** | 圖片中有什麼？ | `dog`、`grass`、`outdoor`＋confidence | Image Analysis 3.2 / 4.0 |
-| **Categories** | 整張圖屬於哪個固定類別？ | `animal_dog`、`people_group` | Image Analysis 3.2；固定 86-category taxonomy |
-| **Domain-specific Models** | 圖中的名人或地標具體是誰／哪裡？ | `Satya Nadella`、`Forbidden City` | Image Analysis 3.2；`celebrities`、`landmarks` |
-
-```text
-Tags：person、building → 一般描述
-Categories：people_、outdoor_ → 固定階層分類
-Domain-specific Models：名人姓名、地標名稱 → 特定領域識別
-```
-
-`people_` 不代表一定是名人，`outdoor_` 或 `building_` 也不代表一定是知名地標；它們只能作為進一步執行 domain-specific analysis 的線索。Domain-specific Models 是 Microsoft 預先訓練的固定模型，不是使用自有圖片訓練的 **Custom Vision**。
-
-### Legacy terminology
-
-| Legacy wording | Current understanding |
-|---|---|
-| Azure Cognitive Services / Computer Vision | 現行文件可見 Azure Vision in Foundry Tools；仍要依 API 版本判斷 |
-| Associating an image with metadata | **Tagging** |
-| Specialized domain models | 舊版 **celebrities＋landmarks** |
-| Chat Completions `image_url` content | Responses 使用 `input_image`，欄位內仍可使用 `image_url` |
+> **啾啾筆記：** **Tags** 和 **Objects** 也常出現在 3.2 舊題，但不是 3.2 專屬概念。真正看到 Categories、Brands、Image Type、Description 或 celebrities／landmarks 時，再優先想到 Image Analysis 3.2。Domain-specific Models 也不是使用自己的圖片訓練 Custom Vision 喔～
 
 ## 5. Quick Memory Rules
 
@@ -309,8 +251,89 @@ Domain-specific Models：名人姓名、地標名稱 → 特定領域識別
 - **OCR 讀文字；Content Understanding 理解結構。**
 - **Vision 看圖；Image generation 產圖。**
 
-## 6. Official Sources
+## 6. 常見錯誤與詳解
 
+### Q03 — Legacy Domain-specific Models
+
+![Original question](../assets/mistakes/Q03_source_image_8.png)
+
+| 重點 | 答案 |
+|---|---|
+| **正確答案** | **A. celebrities、C. landmarks** |
+| **題目線索** | `two specialized domain models` |
+| **考點** | Legacy Image Analysis 3.2 功能名稱 |
+
+**為什麼選 A、C：** 舊版 Image Analysis 的兩個 domain-specific models 就是 `celebrities` 與 `landmarks`，分別辨識名人和知名地標。
+
+| 選項 | 為什麼選／不選 |
+|---|---|
+| **A. celebrities** | 辨識名人的 domain model。 |
+| B. image types | 判斷 clip art／line drawing，不是 domain model。 |
+| **C. landmarks** | 辨識地標的 domain model。 |
+| D. people_ | 舊版 category 名稱／前綴。 |
+| E. people_group | 舊版固定 taxonomy 中的 category。 |
+
+**補充與延伸（Legacy exam-bank context）：** 這組功能屬於舊版 Image Analysis 3.2 題型，不能直接當成現行 Image Analysis 或 multimodal model 的固定功能清單。舊題看到 specialized domain models，仍選 celebrities + landmarks。
+
+> **記憶：** Domain models = 名人 + 地標；`people_` 是 category。
+
+**官方來源：** [Detect domain-specific content](https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/concept-detecting-domain-content)、[Migration options](https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/migration-options)
+
+---
+
+### Q05 — Tagging 是描述性 Metadata
+
+![Original question](../assets/mistakes/Q05_source_image_10.png)
+
+| 重點 | 答案 |
+|---|---|
+| **正確答案** | **D. tagging** |
+| **題目線索** | `metadata that summarizes the attributes` |
+| **考點** | Tags、Categories 與 Image Type 的差異 |
+
+**為什麼選 D：** Tagging 會回傳多個描述圖片內容的詞彙與 confidence，例如 `outdoor`、`building`、`person`，符合「描述屬性的 metadata」。
+
+| 選項 | 為什麼選／不選 |
+|---|---|
+| A. categorizing | 將圖片放入固定 taxonomy，不是產生多個描述詞。 |
+| B. content organization | 是應用情境，不是影像分析的輸出功能名稱。 |
+| C. detecting image types | 判斷 clip art／line drawing。 |
+| **D. tagging** | 產生多個描述性 tags 與 confidence。 |
+
+**補充與延伸：** Tag 可同時有很多個；Category 是從固定分類集合選類別。題目提到 metadata、keywords、descriptive words，通常指 Tags。
+
+> **記憶：** Tags 是多張標籤；Categories 是固定分類箱。
+
+**官方來源：** [Image tagging concepts](https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/concept-tagging-images)
+
+---
+
+### Q11 — Responses API 比較兩張圖片
+
+![Original question](../assets/mistakes/Q11_source_image_16.png)
+
+| 重點 | 答案 |
+|---|---|
+| **正確答案** | **C. 文字指令 + 每張圖片各一個 `input_image`** |
+| **題目線索** | `two HTTPS image URLs`、`single request`、`Responses API` |
+| **考點** | Responses API 的多張圖片輸入格式 |
+
+**為什麼選 C：** 模型需要一段比較指令，以及兩個明確標示為 `input_image` 的視覺輸入。這樣才能在同一次 request 中看到並比較兩張圖片。
+
+| 選項 | 為什麼選／不選 |
+|---|---|
+| A | Image generation 用來產圖，不是分析既有圖片。 |
+| B | 這是另一套 API schema；題目指定 Responses API。 |
+| **C** | 指令與兩張視覺輸入的格式都正確。 |
+| D | 把 URL 寫在 `input_text` 中，不等於提供圖片內容。 |
+
+**補充與延伸：** Responses API 使用 `input_text`／`input_image`；Chat Completions 使用另一套 message content 格式。題目指定 API 時，不能混用欄位。
+
+> **記憶：** Responses：文字用 `input_text`，每張圖各用一個 `input_image`。
+
+**官方來源：** [Responses API](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses)
+
+## 7. Official Sources
 核對日期：**2026-09-08**。
 
 - [AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)

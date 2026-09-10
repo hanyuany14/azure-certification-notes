@@ -46,6 +46,6 @@ HackMD 的官方 GitHub Sync 是逐篇 note 的 push／pull，不會在每次 Gi
 
 ## 建議公開範圍
 
-公開 `ai-901/knowledge/` 即可作為閱讀筆記；`mistakes/` 可視需要公開。`source/` 與 `raw notes/` 是保存用原始材料，不需要建立 HackMD note。
+公開 `ai-901/knowledge/` 即可看到完整筆記與各篇底部的錯題詳解。`source/` 與 `raw notes/` 是保存用原始材料，不需要建立 HackMD note。
 
 官方說明：[Sync a Note with GitHub](https://hackmd.io/s/link-with-github)

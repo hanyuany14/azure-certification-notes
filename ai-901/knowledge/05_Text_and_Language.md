@@ -6,16 +6,24 @@
 
 以下任務主要由 **Azure Language in Foundry Tools** 提供。考試先看題目要求的輸出，再選功能。
 
-| Task | Microsoft service | 概念與例子 | Output | Exam keywords |
-|---|---|---|---|---|
-| **Key Phrase Extraction** | Azure Language in Foundry Tools | 找出主要概念；`The staff were helpful` → `staff` | 重點片語清單 | main topics、key phrases |
-| **Named Entity Recognition (NER)** | Azure Language in Foundry Tools | 辨識並分類人名、地點、組織等；`Contoso opened in Taipei` → Contoso＝Organization、Taipei＝Location | Entity、category、位置、confidence | people、places、organizations |
-| **Entity Linking** | Azure Language in Foundry Tools | 判斷同名實體實際指涉，並連到知識來源 | Linked entity、Wikipedia URL | disambiguate、Wikipedia、link |
-| **Sentiment Analysis** | Azure Language in Foundry Tools | 判斷整句或文件的情緒；評論可同時包含正負內容 | Positive、negative、neutral、mixed 與 confidence | customer feeling、positive / negative |
-| **Opinion Mining** | Azure Language in Foundry Tools | 把情緒連到特定對象；`staff were helpful` → staff＝target、helpful＝assessment | Target、assessment、sentiment | opinion about、aspect、target |
-| **Extractive Summarization** | Azure Language in Foundry Tools | 從原文挑出重要句子，保留原本措辭 | 原文句子子集 | select sentences、preserve wording |
-| **Abstractive Summarization** | Azure Language in Foundry Tools | 用新的句子濃縮原文 | 新生成的摘要 | rewrite、concise summary |
-| **Language Detection** | Azure Language in Foundry Tools | 判斷每份文件的主要語言 | Language name、ISO code、confidence | predominant language、ISO 639-1 |
+下面全部使用同一段客服 utterance，這樣可以直接比較不同任務會從同一份文字中取出什麼：
+
+> `On March 8, I visited the Microsoft Store in New York. The Surface staff were helpful, but the two-hour wait was terrible. Please send my refund to Contoso Bank.`
+
+| Task | Microsoft service | 概念 | 例子 | Output | Exam keywords |
+|---|---|---|---|---|---|
+| **Key Phrase Extraction** | Azure Language in Foundry Tools | 找出文字中的主要概念 | 取出 `Microsoft Store`、`Surface staff`、`two-hour wait`、`refund` | 重點片語清單 | main topics、key phrases |
+| **Named Entity Recognition (NER)** | Azure Language in Foundry Tools | 辨識實體並分類為人名、地點、組織、日期等 | `Microsoft`＝Organization、`New York`＝Location、`March 8`＝Date | Entity、category、位置、confidence | people、places、organizations |
+| **Entity Linking** | Azure Language in Foundry Tools | 判斷文字中的實體實際指涉，並連到知識來源 | 將 `Microsoft` 連到對應的 Wikipedia 實體 | Linked entity、Wikipedia URL | disambiguate、Wikipedia、link |
+| **Sentiment Analysis** | Azure Language in Foundry Tools | 判斷整句、句子或文件的情緒 | `helpful` 是正面、`terrible` 是負面，因此整體可能是 **mixed** | Positive、negative、neutral、mixed 與 confidence | customer feeling、positive / negative |
+| **Opinion Mining** | Azure Language in Foundry Tools | 把情緒連回被評論的對象 | `staff`＝target、`helpful`＝assessment；`wait`＝target、`terrible`＝assessment | Target、assessment、sentiment | opinion about、aspect、target |
+| **Extractive Summarization** | Azure Language in Foundry Tools | 從原文挑出重要句子，不改寫內容 | 直接選出 `The Surface staff were helpful, but the two-hour wait was terrible.` | 原文句子子集 | select sentences、preserve wording |
+| **Abstractive Summarization** | Azure Language in Foundry Tools | 用新的句子濃縮原文意思 | `The customer praised the staff but complained about the wait and requested a refund.` | 新生成的摘要 | rewrite、concise summary |
+| **Language Detection** | Azure Language in Foundry Tools | 判斷文件使用的主要語言 | 判斷這段 utterance 為 `English`，ISO code 為 `en` | Language name、ISO code、confidence | predominant language、ISO 639-1 |
+
+> **啾啾筆記：** 同一句話可以同時送去做不同分析，差別在於你想取得哪一種 output。看到「主題」選 key phrases；看到「人、地點、組織」選 NER；看到「對什麼東西有什麼評價」則選 opinion mining 喔～
+
+表格中的結果用來幫助理解概念；實際擷取的片語、摘要與 confidence 可能因模型版本而不同。
 
 > **Exam priority vs lifecycle：**Key phrase、sentiment 和 summarization 仍在目前 AI-901 的文字分析範圍中，但其 Azure Language API 已公告退役日期。概念是否會考，和產品生命週期是兩件事。
 
@@ -86,7 +94,7 @@ client = TextAnalyticsClient(
 result = client.recognize_entities(["Contoso opened an office in Taipei."])
 ```
 
-考試辨認：**Language endpoint＋credential → `TextAnalyticsClient` → 傳入 documents → 逐份檢查結果。**正式應用不要把 key 寫死在程式碼中。
+Language endpoint＋credential → `TextAnalyticsClient`
 
 ### 常見方法與輸出
 
@@ -125,8 +133,65 @@ result = client.recognize_entities(["Contoso opened an office in Taipei."])
 - **Utterance = words；Intent = goal；Entity = details。**
 - **Detection 判斷語言；Translation 轉換語言。**
 
-## 6. Official Sources
+## 6. 常見錯誤與詳解
 
+### Q04 — Language Detection 回傳欄位
+
+![Original question](../assets/mistakes/Q04_source_image_9.png)
+
+| 快速判斷 | 內容 |
+|---|---|
+| **答案** | **B. ISO 639-1 Code、C. Language Name、D. Score** |
+| **線索** | `values returned`、`language detection` |
+| **考點** | Language Detection output |
+| **錯誤原因** | 把其他服務的輸出欄位混進 Language Detection |
+
+**為什麼選 B、C、D：**Language Detection 的主要結果包含語言名稱、ISO 639-1 code 和 confidence score，例如 `English`、`en`、`0.99`。
+
+| Option | 為什麼是／不是 |
+|---|---|
+| A. Bounding box coordinates | 影像或文件的位置資訊，與文字語言偵測無關。 |
+| **B. ISO 639-1 Code** | **是。**例如 `en`。 |
+| **C. Language Name** | **是。**例如 `English`。 |
+| **D. Score** | **是。**`confidenceScore` 通常介於 0 和 1。 |
+| E. Wikipedia URL | Entity Linking 的舊式結果可能含連結，不是 Language Detection。 |
+
+**補充與延伸：**現行 REST 欄位常見 `name`、`iso6391Name`、`confidenceScore`；SDK 命名可能因語言而不同。
+
+> **記法：Language Detection = name＋ISO code＋confidence。**
+
+**官方來源：** [Overview](https://learn.microsoft.com/en-us/azure/ai-services/language-service/language-detection/overview)、[Call the API](https://learn.microsoft.com/en-us/azure/ai-services/language-service/language-detection/how-to/call-api)
+
+---
+
+### Q06 — Unknown Language 的 Confidence Score
+
+![Original question](../assets/mistakes/Q06_source_image_11.png)
+
+| 快速判斷 | 內容 |
+|---|---|
+| **現行答案** | **`0.0`；題目沒有正確選項** |
+| **舊題庫答案** | **C. `NaN`** |
+| **線索** | `unknown language name`、`confidence score` |
+| **考點** | Current behavior vs legacy exam-bank behavior |
+| **錯誤原因** | 把舊版 `NaN` 當成現行 API 規格 |
+
+**為什麼是 `0.0`：**現行文件說明，無法判定語言時會回傳 `(Unknown)`、空的 ISO code，以及 `confidenceScore: 0.0`。
+
+| Option | 現行為什麼不是 |
+|---|---|
+| A. `1` | 表示最高信心，和 unknown 相反。 |
+| B. `-1` | 不在一般 confidence 的 0–1 範圍內。 |
+| C. `NaN` | 只符合這份舊題庫的預期答案。 |
+| D. `Unknown` | 是語言名稱的語意，不是數值 score。 |
+
+**補充與延伸：**舊題若明確沿用這組選項，辨識其預期答案為 `NaN`；實作與現行知識題則記 `0.0`。
+
+> **記法：現行 Unknown language → empty ISO code＋0.0。**
+
+**官方來源：** [Ambiguous content](https://learn.microsoft.com/en-us/azure/ai-services/language-service/language-detection/how-to/call-api#ambiguous-content)
+
+## 7. Official Sources
 核對日期：**2026-09-08**。
 
 - [AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)

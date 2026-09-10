@@ -1,6 +1,6 @@
 # Responsible AI｜負責任的人工智慧
 
-答題先找情境要改善的**主要問題**，選最直接對應的原則。
+這一個單元是蠻重要但是很好拿分的單元，可以把握答題先找情境要改善的**主要問題**，選最直接對應的原則。
 
 ## 1. 六大原則
 
@@ -37,10 +37,36 @@ Microsoft GenAI 流程：**Identify → Measure → Mitigate → Operate**，記
 
 **NIST AI RMF**（AI Risk Management Framework）是自願採用的外部風險管理框架，不是 Azure 產品。四個功能為 **GOVERN、MAP、MEASURE、MANAGE**；與 Microsoft 四階段密切相關，但名稱不能逐字互換。
 
-> **修正：**原筆記寫成 `GOVERN → MAP → MEASURE → MANAGE`，容易誤認為固定順序；實際上 **GOVERN 貫穿整個風險管理過程**，四個功能並非固定先後步驟。
 
-## 4. Official Sources
+## 4. 常見錯誤與詳解
 
+### Q02 — Accountability 與治理責任
+
+![Original question](../assets/mistakes/Q02_source_image_7.png)
+
+| 快速判斷 | 內容 |
+|---|---|
+| **答案** | **A. Accountability** |
+| **線索** | `governance`、`organizational responsibility`、`ethical and legal standards` |
+| **考點** | Microsoft Responsible AI principles |
+| **錯誤原因** | 容易把「向人說明」的 Transparency 和「由誰負責」的 Accountability 混淆 |
+
+**為什麼選 A：**題目要求建立治理、監督與責任歸屬，核心是人和組織必須對 AI 系統負責，因此選 **Accountability**。
+
+| Option | 為什麼是／不是 |
+|---|---|
+| **A. Accountability** | **是。**負責任、治理與 human oversight。 |
+| B. Fairness | 公平對待不同群體，重點是 bias 與 discrimination。 |
+| C. Inclusiveness | 讓不同能力和背景的人都能使用與受益。 |
+| D. Transparency | 說明系統如何運作、能力與限制，不是指定責任歸屬。 |
+
+**補充與延伸：**目前 Microsoft 仍使用 **Accountability**。看到 governance、oversight、human responsibility 或「誰負責」，直接聯想到它。
+
+> **記法：Transparency 說清楚；Accountability 說誰負責。**
+
+**官方來源：** [Microsoft Responsible AI principles](https://www.microsoft.com/en-us/ai/principles-and-approach)、[AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)
+
+## 5. Official Sources
 核對日期：**2026-09-08**。
 
 - [AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)

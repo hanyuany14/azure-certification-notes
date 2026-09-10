@@ -2,24 +2,84 @@
 
 先看題目需要的是**轉錄、朗讀、翻譯、辨識語言，還是回答語音問題**。相同的 audio input，可能對應不同工作負載。
 
+```text
+認識語音能力 → 看懂 workload flow → 判斷是否需要 Custom Speech
+→ 最後辨認 SDK objects、methods 與 API fields
+```
+
 ## 1. Core Concepts
 
-| Capability | Azure service / product | Input → Output | 例子與 Exam keywords |
-|---|---|---|---|
-| **Speech Recognition / Speech to Text (STT)** | Azure Speech in Foundry Tools | Audio → Transcript | 會議轉錄、字幕；transcribe、recognize |
-| **Speech Synthesis / Text to Speech (TTS)** | Azure Speech in Foundry Tools | Text / SSML → Audio | 朗讀通知；voice、read aloud、synthesize |
-| **Speech Translation** | Azure Speech in Foundry Tools | 語音 → 另一語言的文字或語音 | 即時口譯；translate spoken language |
-| **Language Identification (LID)** | Azure Speech in Foundry Tools | Audio＋candidate languages → Language | 判斷音訊使用哪種語言；identify spoken language |
-| **Speaker Diarization** | Azure Speech in Foundry Tools | 多人音訊 → Speaker labels＋transcript | 標示誰在何時說話；who spoke when |
-| **Custom Speech** | Azure Speech in Foundry Tools | 領域資料 → Custom STT model | 改善專業術語或特定環境辨識；domain vocabulary |
-| **Call center transcription / analytics** | Azure Speech＋Azure Language in Foundry Tools | 通話 → Transcript＋speaker labels＋analysis | 客服錄音、PII redaction、sentiment、summary |
-| **Multimodal Audio Model** | Audio-capable model in Microsoft Foundry | Text / Audio → Generated text / audio | 聽懂口說問題並回答；spoken prompt、modalities |
+下面全部使用同一個情境：**Contoso 客服中心收到一通跨語言來電，客戶用西班牙文說「我想申請 X200 裝置的退款」，客服人員則使用英文回答。**
+
+| Capability | Azure service / product | Input → Output | 同一個客服情境的例子 | Exam keywords |
+|---|---|---|---|---|
+| **Speech Recognition / Speech to Text (STT)** | Azure Speech in Foundry Tools | Audio → Transcript | 將客戶與客服的通話錄音轉成逐字稿 | transcribe、recognize、caption |
+| **Speech Synthesis / Text to Speech (TTS)** | Azure Speech in Foundry Tools | Text / SSML → Audio | 將系統產生的退款說明朗讀給客戶聽 | voice、read aloud、synthesize |
+| **Speech Translation** | Azure Speech in Foundry Tools | 語音 → 另一語言的文字或語音 | 將客戶的西班牙文語音翻譯成英文，讓客服理解 | translate spoken language、real-time translation |
+| **Language Identification (LID)** | Azure Speech in Foundry Tools | Audio＋candidate languages → Language | 先判斷客戶說的是西班牙文 | identify spoken language、candidate languages |
+| **Speaker Diarization** | Azure Speech in Foundry Tools | 多人音訊 → Speaker labels＋transcript | 在逐字稿中標示 Speaker 1 與 Speaker 2，區分每段發言 | who spoke when、speaker labels |
+| **Custom Speech** | Azure Speech in Foundry Tools | 領域資料 → Custom STT model | 提供產品詞彙與音訊資料，改善 `X200` 等專有名詞的辨識 | domain vocabulary、acoustic conditions、custom STT |
+| **Call center transcription / analytics** | Azure Speech＋Azure Language in Foundry Tools | 通話 → Transcript＋speaker labels＋analysis | 轉錄整通電話後，分析情緒、遮蔽 PII 並產生摘要 | call recording、PII redaction、sentiment、summary |
+| **Multimodal Audio Model** | Audio-capable model in Microsoft Foundry | Text / Audio → Generated text / audio | 讓模型直接聽懂退款問題，再生成文字或語音回答 | spoken prompt、generated response、modalities |
+
+> **啾啾筆記：** 這些功能可以出現在同一通客服電話中，但目的不同。STT 是把原話寫下來；Speech Translation 是換語言；diarization 是分辨誰在說話；audio model 則是理解問題後產生新的回答喔～
 
 > **Speech transcription vs audio model：**STT 的輸出是使用者說話內容的逐字稿；audio-capable model 可以理解問題並生成回答。兩者都有 audio input，但目的不同。
 
-## 2. Workload flows 與 SDK objects
+## 2. Workload flows｜服務如何串聯
 
-### Speech to Text：服務設定＋輸入來源＋辨識器
+| 需求 | Flow | 判斷重點 |
+|---|---|---|
+| 將語音寫成文字 | Audio → Speech Recognition → Transcript | **STT**；保留原本說話內容 |
+| 將文字朗讀出來 | Text / SSML → Speech Synthesis → Audio | **TTS**；可設定 language、voice 與輸出格式 |
+| 翻譯口說內容 | Audio → Speech Translation → Target text / audio | 目標是換成另一種語言 |
+| 判斷口說語言 | Audio＋candidate languages → LID → Language | 不等於文字的 Language Detection |
+| 區分多人發言 | Multi-speaker audio → Diarization → Speaker labels＋transcript | Speaker label 不一定等於 Agent / Customer 等業務角色 |
+| 分析客服通話 | Call audio → Transcription / diarization → PII、sentiment、summary | Speech 負責轉錄與 speakers；Language 負責後續文字分析 |
+| 回答口說問題 | Audio prompt → Deployed audio model → Generated answer | 模型理解問題並回答，不只是產生逐字稿 |
+
+> **啾啾筆記：** 這裡先看 input 和 output 就好。等確定要做 STT 或 TTS 之後，再到 SDK 章節辨認 `SpeechRecognizer` 或 `SpeechSynthesizer`。
+
+## 3. 預設模型與客製化（Universal Language Model vs customization）
+
+**Universal Language Model (ULM)** 是 Azure Speech 預先訓練的通用 **base model**。它可以先處理兩種常見的語音情境：
+
+| Base model scenario | 說話方式 | 例子與考試區分 |
+|---|---|---|
+| **Conversational speech** | 兩人以上自然交談，語句較口語，也可能互相打斷 | 會議、客服通話；多人錄音常搭配 diarization |
+| **Dictation** | 通常由單人清楚地對裝置口述，希望系統直接寫成文字 | 口述 email、報告或筆記；例如 Microsoft 365 Dictate |
+
+> **啾啾筆記：** 可以把 Conversational speech 和 Dictation 記成 ULM 能處理的兩種常見情境，但它們不是兩個獨立的 base models。Dictation 就是把「想寫下來的內容」直接念給系統聽喔～
+
+先用真實音訊測試 base model。如果一般會議、客服對話或口述內容已能正確辨識，就不需要另外訓練模型；只有辨識效果不足時，才加入額外設定或考慮 **Custom Speech**。
+
+```text
+Base model / ULM
+→ 測試 Conversational speech 或 Dictation
+→ 少量特殊詞彙：Phrase list
+→ 專業詞彙、特殊發音或錄音環境仍辨識不佳：Custom Speech
+```
+
+| 改善方式 | 作用 | 例子 |
+|---|---|---|
+| **Phrase list** | 在執行時提高少量特定詞語的辨識權重，不需要訓練新模型 | 人名、地名、產品名稱 |
+| **Language data** | 改善領域詞彙與文字模式 | 醫療術語、公司內部用語 |
+| **Structured text / pronunciation** | 指定特殊發音與顯示文字格式 | 人名、縮寫、品牌名稱 |
+| **Audio＋reference transcriptions** | 使用音訊及正確逐字稿改善特定錄音條件下的辨識 | 工廠噪音、特殊麥克風環境 |
+
+> **Dictation SDK 提示：** `SpeechConfig.enable_dictation()` 用來啟用 dictation，且只支援 continuous recognition；它是辨識設定，不代表切換到另一個 ULM 模型。
+
+Custom Speech 可使用的資料類型會依 locale 而異，因此要先確認目標語言是否支援。
+
+## 4. API / SDK｜先分清 Speech SDK 與 audio model
+
+### Speech SDK
+
+#### SDK objects｜設定、音訊來源與執行物件
+
+Speech SDK 會把服務設定、音訊來源／去向，以及實際執行辨識或合成的物件分開。
+
+**Speech to Text**
 
 ```text
 SpeechConfig + AudioConfig → SpeechRecognizer → Recognition result / events
@@ -27,13 +87,13 @@ SpeechConfig + AudioConfig → SpeechRecognizer → Recognition result / events
 
 | SDK object | 負責什麼 | Example |
 |---|---|---|
-| **SpeechConfig** | 認證、region / endpoint、辨識語言等服務設定 | `speech_recognition_language = "en-US"` |
+| **SpeechConfig** | 認證、region / endpoint 與辨識語言等服務設定 | `speech_recognition_language = "en-US"` |
 | **AudioConfig** | 指定要辨識的音訊來源 | 麥克風、WAV 檔或 input stream |
 | **SpeechRecognizer** | 執行 speech-to-text | Audio → recognized text |
 
-例子：會議 WAV 轉錄時，`SpeechConfig` 指定服務與語言，`AudioConfig` 指定檔案，`SpeechRecognizer` 執行辨識。
+例子：轉錄客服 WAV 錄音時，`SpeechConfig` 指定服務與語言，`AudioConfig` 指定檔案，最後由 `SpeechRecognizer` 執行辨識。
 
-### Text to Speech：服務設定＋輸出去向＋合成器
+**Text to Speech**
 
 ```text
 Text + SpeechConfig + AudioOutputConfig → SpeechSynthesizer → Audio
@@ -42,49 +102,14 @@ Text + SpeechConfig + AudioOutputConfig → SpeechSynthesizer → Audio
 | SDK object | 負責什麼 | Example |
 |---|---|---|
 | **SpeechConfig** | 認證、region / endpoint、voice 與輸出格式 | `speech_synthesis_voice_name = "en-US-Ava:DragonHDLatestNeural"` |
-| **AudioOutputConfig** | 指定合成音訊要送去哪裡 | 預設喇叭、檔案或 output stream |
+| **AudioOutputConfig** | 指定合成音訊要播放或儲存到哪裡 | 預設喇叭、檔案或 output stream |
 | **SpeechSynthesizer** | 執行 text-to-speech | Text → synthesized audio |
 
-例子：朗讀系統回覆時，先以 `speech_synthesis_voice_name` 選 Ava，再用 `AudioOutputConfig` 指定從喇叭播放。
+例子：朗讀客服系統的退款說明時，先用 `SpeechConfig` 選擇 voice，再用 `AudioOutputConfig` 指定從喇叭播放，最後由 `SpeechSynthesizer` 執行合成。
 
-> **記法：**`SpeechConfig` 管服務與語音設定；`AudioConfig` 管 STT 輸入；`AudioOutputConfig` 管 TTS 輸出。
+> **SDK 記法：** `SpeechConfig` 管服務與語音設定；`AudioConfig` 管 STT 輸入；`AudioOutputConfig` 管 TTS 輸出。
 
-### 其他工作負載
-
-| 需求 | Flow | 判斷重點 |
-|---|---|---|
-| 口說內容翻譯 | Audio → Speech Translation → Target text / audio | 目標是換語言 |
-| 判斷口說語言 | Audio＋candidate languages → LID → Language | 不等於文字 Language Detection |
-| 區分多人發言 | Multi-speaker audio → Diarization → Speaker labels | Speaker label 不一定等於 Agent / Customer 業務角色 |
-| 分析客服通話 | Call audio → Batch transcription / diarization → PII、sentiment、summary | Speech 負責轉錄與分離 speakers；Language 負責文字分析 |
-| 回答口說問題 | Audio prompt → Deployed audio model → Generated answer | 不是只把問題轉成逐字稿 |
-
-## 3. 預設模型與客製化（Universal Language Model vs customization）
-
-**Universal Language Model (ULM)** 是 Azure Speech 的基礎 speech-to-text model。先使用真實音訊評估 base model；若專業詞彙、發音、噪音或錄音環境造成明顯錯誤，再考慮 **Custom Speech**。
-
-| Concept | 簡化理解 | 例子 |
-|---|---|---|
-| **Base model / ULM** | Microsoft 預先訓練的通用辨識模型 | 一般會議與日常對話 |
-| **Language data** | 改善領域詞彙與文字模式 | 產品名稱、醫療術語 |
-| **Structured text / pronunciation** | 指定特殊發音與顯示文字格式 | 人名、縮寫、品牌名稱 |
-| **Audio＋reference transcriptions** | 改善特定錄音條件下的辨識 | 工廠噪音、特殊麥克風環境 |
-| **Phrase list** | 在執行時提高特定詞語的辨識權重 | 少量人名或地名；不需要訓練模型 |
-
-ULM 並不是固定附帶兩個名為 Conversational 和 Dictation 的獨立 base models；在舊教材中，兩者主要描述 ULM 可處理的語音情境：
-
-| Scenario | 說話方式 | Example / exam distinction |
-|---|---|---|
-| **Conversational speech** | 兩人以上自然交談，可能互相打斷、語句較口語 | 會議、客服通話；常搭配 diarization |
-| **Dictation** | 通常由單人清楚地對裝置口述，希望直接形成文字 | 口述 email、報告或筆記；Microsoft 365 Dictate |
-
-> **Dictation 記法：**使用者不是在和另一個人聊天，而是把「要寫下來的文字」念給系統聽。Speech SDK 的 `SpeechConfig.enable_dictation()` 用於啟用 dictation，且只支援 continuous recognition；它不代表切換到另一個 ULM 模型。
-
-文字、發音及帶參考逐字稿的音訊才是客製模型的改善資料。Custom Speech 的資料支援會因 locale 而異。
-
-## 4. Important API / SDK Patterns
-
-### Speech SDK for Python：一次辨識
+#### Python 程式碼
 
 ```python
 import os
@@ -105,6 +130,8 @@ result = recognizer.recognize_once_async().get()
 print(result.text)
 ```
 
+常見 Method:
+
 | API / event | 用途 | 必記區分 |
 |---|---|---|
 | `recognize_once_async()` | 辨識單一 utterance | 依結尾靜音或約 30 秒上限結束；不是長時間多句辨識 |
@@ -112,7 +139,7 @@ print(result.text)
 | `.get()` | 等待 `ResultFuture` 完成並取得結果 | 會阻塞等候；加了 `_async` 不代表整段程式都非阻塞 |
 | `recognized` event | 接收 continuous recognition 的辨識結果 | 啟動操作完成不代表所有語音已辨識完 |
 
-### Speech SDK：指定 voice 與輸出
+#### Python：指定 voice 與輸出
 
 ```python
 speech_config.speech_synthesis_voice_name = "en-US-Ava:DragonHDLatestNeural"
@@ -134,21 +161,10 @@ result = synthesizer.speak_text_async("Your request is complete.").get()
 | `set_speech_synthesis_output_format(...)` | 指定音訊編碼格式 | 與播放／存檔去向是不同設定 |
 | `SpeechSynthesizer` | 執行語音合成 | `speak_text_async(...)` |
 
-### Audio modality matrix
+### Multimodal audio model API
 
-> **這不是 Speech SDK 設定表。**它描述支援 audio 的已部署多模態模型，其 input 與 output modality 組合。實際支援仍取決於模型與 API。
 
-| Model input | Requested output | 例子 |
-|---|---|---|
-| Text | Text＋Audio | 輸入文字問題，取得文字與口說回答 |
-| Audio | Text | 用錄音提問，取得生成的文字回答 |
-| Audio | Text＋Audio | 用錄音提問，取得文字與音訊回答 |
-| Text＋Audio | Text | 用文字指定任務，再分析錄音並回傳文字 |
-| Text＋Audio | Text＋Audio | 用文字指定任務，再以文字和聲音回答 |
-
-在 audio model API 中：輸入內容放在 `messages[].content`；想要的輸出放在 `modalities`。這些欄位不屬於 `SpeechRecognizer` 或 `SpeechSynthesizer`。
-
-### Audio Chat Completions：WAV → Base64 → input_audio
+#### Audio Chat Completions：WAV → Base64 → input_audio
 
 ```python
 import base64
@@ -181,30 +197,18 @@ response = client.chat.completions.create(
 
 | Compare | Difference |
 |---|---|
-| **STT vs TTS** | Audio → Text vs Text → Audio |
-| **Transcription vs generated response** | 記錄原話 vs 理解問題後產生回答 |
-| **SpeechConfig vs AudioConfig** | 服務／語言／voice 設定 vs STT 音訊來源 |
-| **AudioConfig vs AudioOutputConfig** | 辨識輸入 vs 合成輸出 |
-| **Language vs voice name** | 語言 locale vs 特定人物聲線 |
-| **Once vs continuous** | 單一 utterance vs 多段事件式辨識 |
-| **LID vs diarization** | 判斷說哪種語言 vs 判斷哪位 speaker 在說話 |
-| **Speech LID vs text Language Detection** | Audio input vs text input |
-| **Speech SDK voice vs audio model voice** | Ava 等 Speech voice vs alloy 等模型 voice；不可混用名稱 |
+| **Speech to Text 與 Text to Speech** | 語音轉文字，與文字轉語音 |
+| **Transcription 與 generated response** | 記錄使用者說的原話，與理解問題後產生新的回答 |
+| **SpeechConfig 與 AudioConfig** | 前者設定服務、語言與 voice；後者指定 Speech to Text 的音訊來源 |
+| **AudioConfig 與 AudioOutputConfig** | 前者指定辨識輸入；後者指定語音合成的輸出去向 |
+| **Language 與 voice name** | 前者是語言或 locale；後者是特定人物聲線 |
+| **Single-shot recognition 與 continuous recognition** | 前者辨識單一 utterance；後者持續接收多段事件式結果 |
+| **Language Identification 與 Speaker Diarization** | 前者判斷使用哪種語言；後者判斷是哪位 speaker 在說話 |
+| **Spoken Language Identification 與文字 Language Detection** | 前者接收 audio input；後者接收 text input |
+| **Azure Speech voice 與 audio model voice** | 前者使用 Ava 等 Speech voice；後者可能使用 alloy 等模型 voice，兩套名稱不可混用 |
 
-## 6. Current vs Legacy
 
-| Term / capability | Status | 快速理解 |
-|---|---|---|
-| **Azure Speech in Foundry Tools** | **Current** | 現行正式服務名稱 |
-| `azure-cognitiveservices-speech` | **Current** | Python Speech SDK 的現行 package / import 名稱 |
-| **Universal Language Model** | **Current** | Azure Speech base model 的官方說明 |
-| **Conversational / Dictation model choice** | **Legacy exam-bank context** | 舊教材的情境分類；現行文件不將兩者列成固定的兩個 ULM base models |
-| Audio-capable models | **Current；依模型版本判斷 GA / Preview** | 不把所有 audio model 一律視為 Preview |
-| `gpt-4o-audio-preview` 等 preview 名稱 | **Preview / legacy sample context** | 看到舊範例時依指定模型與 API 作答 |
-| `AzureOpenAI`＋日期型 API version | **Legacy exam-bank pattern** | 現行 v1 範例可使用 `OpenAI` 與 `/openai/v1/` |
-| Azure Cognitive Services Speech | **Legacy terminology** | 舊品牌名稱；概念可對應現行 Azure Speech |
-
-## 7. Quick Memory Rules
+## 6. Quick Memory Rules
 
 - **Recognize = 聽寫；Synthesize = 朗讀。**
 - **SpeechConfig 管服務；AudioConfig 管輸入；AudioOutputConfig 管輸出。**
@@ -213,8 +217,87 @@ response = client.chat.completions.create(
 - **Audio model 的 input / modalities 不是 Speech SDK 的 AudioConfig。**
 - **先測 base model，不足時再做 Custom Speech。**
 
-## 8. Official Sources
+## 7. 常見錯誤與詳解
 
+### Q15 — WAV 輸入與文字／音訊輸出
+
+![Original question](../assets/mistakes/Q15_source_image_20.png)
+
+| 重點 | 答案 |
+|---|---|
+| **正確答案** | **C. Base64 WAV → `input_audio`，並要求 text + audio modalities** |
+| **題目線索** | `recorded WAV`、`both text and WAV audio output` |
+| **考點** | Audio-capable model 的輸入格式與輸出 modalities |
+
+**為什麼選 C：** 服務不能直接讀取本機檔名。WAV 內容要先轉成 Base64，標示為 `input_audio`；若要同時取得文字和聲音，輸出 modalities 必須同時包含 text 與 audio。
+
+| 選項 | 為什麼選／不選 |
+|---|---|
+| A | 只有 text modality，不會回傳音訊。 |
+| B | 檔名不是音訊內容，服務無法存取本機檔案。 |
+| **C** | 同時提供真正的音訊內容，並要求兩種輸出。 |
+| D | WAV bytes 不能當成一般文字輸入。 |
+
+**補充與延伸：** 這題考的是支援 audio 的模型 API，不是 Speech SDK。模型名稱與 API 版本可能改變，但判斷方式不變：先確認音訊是否真的傳入，再確認輸出 modalities。
+
+> **記憶：** 本機音訊 → Base64 `input_audio`；要聲音回覆 → 加入 audio modality。
+
+**官方來源：** [Azure OpenAI audio generation quickstart](https://learn.microsoft.com/en-us/azure/foundry/openai/audio-completions-quickstart)
+
+---
+
+### Q16 — SpeechConfig、AudioConfig 與辨識模式
+
+![Original question](../assets/mistakes/Q16_source_image_21.png)
+
+![原始補充截圖：題目解說](../assets/mistakes/Q16_new_rationale_image_23.png)
+
+| 重點 | 答案 |
+|---|---|
+| **正確答案** | **No / Yes / No** |
+| **題目線索** | `long-running`、`.get()`、`AudioConfig` |
+| **考點** | 單次／持續辨識與 SDK 物件責任 |
+
+| 敘述 | 判斷 | 原因 |
+|---|---:|---|
+| `recognize_once_async()` 用於長時間、多段語音 | **No** | 它只辨識一個 utterance；多段語音要用 continuous recognition。 |
+| `recognize_once_async().get()` 取得單一 utterance 的結果 | **Yes** | `.get()` 會等待非同步操作完成並取回結果。 |
+| `AudioConfig` 保存 endpoint／region／key | **No** | 連線資料屬於 `SpeechConfig`；`AudioConfig` 指定麥克風、檔案或輸出裝置。 |
+
+**補充與延伸：** 方法名稱有 `_async`，不代表呼叫 `.get()` 後仍不阻塞；`.get()` 會等到該次辨識完成。Continuous recognition 的結果則透過事件陸續取得，最後還要停止辨識。
+
+> **記憶：** `SpeechConfig` 管服務；`AudioConfig` 管聲音；Once 一段、Continuous 多段。
+
+**官方來源：** [Speech-to-text quickstart](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-speech-to-text)、[AudioConfig class](https://learn.microsoft.com/en-us/python/api/azure-cognitiveservices-speech/azure.cognitiveservices.speech.audio.audioconfig)
+
+---
+
+### Q17 — 指定 TTS Voice 並直接播放
+
+![Original question](../assets/mistakes/Q17_source_image_22.png)
+
+| 重點 | 答案 |
+|---|---|
+| **正確答案** | **D. `speech_synthesis_voice_name` + default speaker** |
+| **題目線索** | `Ava`、`play ... on the default speaker` |
+| **考點** | Voice selection 與 audio output destination |
+
+**為什麼選 D：** 題目指定 Ava，因此要設定完整的 `speech_synthesis_voice_name`；題目又要求直接播放，因此輸出要設為 default speaker。
+
+| 選項 | 為什麼選／不選 |
+|---|---|
+| A | Voice 正確，但 file output 只會寫檔。 |
+| B | Speaker 正確，但 locale 只指定語言，無法保證使用 Ava。 |
+| C | Voice 與輸出目的地都不符合。 |
+| **D** | 同時指定 Ava 與預設喇叭。 |
+
+**補充與延伸：** Language／locale 決定語言範圍；voice name 才會選定特定聲音。實作時仍要確認該 voice 在目標區域是否可用。
+
+> **記憶：** 誰來說 → Voice Name；播到哪裡 → AudioOutputConfig。
+
+**官方來源：** [Speech synthesis](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/how-to-speech-synthesis)、[Language and voice support](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts)
+
+## 8. Official Sources
 核對日期：**2026-09-10**。
 
 - [AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)

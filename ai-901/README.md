@@ -8,7 +8,7 @@
 
 | 順序 | 模組 | 用途 |
 |---:|---|---|
-| 00 | [Index](knowledge/00_Index.md) | 全部知識與錯題的快速入口 |
+| 00 | [Index](knowledge/00_Index.md) | 全部知識與文章內錯題的快速入口 |
 | 01 | [Exam Guide](knowledge/01_Exam_Guide.md) | 考試流程、出題方向、練習方式與考後心得 |
 | 02 | [Responsible AI](knowledge/02_Responsible_AI.md) | 六大負責任 AI 原則 |
 | 03 | [AI Models and Workloads](knowledge/03_AI_Models_and_Workloads.md) | 生成式模型、工作負載、模型選擇與設定 |
@@ -21,25 +21,24 @@
 
 目前考試權重：**Identify AI concepts and capabilities 40–45%**；**Implement AI solutions by using Microsoft Foundry 55–60%**。從 00 進入知識庫，先讀 01 掌握考試與複習策略，再讀 02–03 建立概念，以 04–08 作為主要實作範圍；09 用於看懂舊題。
 
-## 錯題索引
+## 常見錯誤與詳解
 
-| 模組 | 錯題筆記 |
+錯題已整合到各篇 knowledge 筆記的最下方，可以在讀完概念後直接查看完整題目、答案與選項解析。
+
+| 模組 | 快速入口 |
 |---|---|
-| Responsible AI | [02 Responsible AI Mistakes](mistakes/02_Responsible_AI_Mistakes.md) |
-| Microsoft Foundry | [04 Foundry Mistakes](mistakes/04_Foundry_Mistakes.md) |
-| Text and Language | [05 Text and Language Mistakes](mistakes/05_Text_and_Language_Mistakes.md) |
-| Speech | [06 Speech Mistakes](mistakes/06_Speech_Mistakes.md) |
-| Computer Vision | [07 Computer Vision Mistakes](mistakes/07_Computer_Vision_Mistakes.md) |
-| Content Understanding | [08 Content Understanding Mistakes](mistakes/08_Content_Understanding_Mistakes.md) |
-
-原始材料沒有可歸入「AI Models and Workloads」的題目截圖，因此未建立空的 `03_AI_Models_Mistakes.md`。
+| Responsible AI | [常見錯誤與詳解](knowledge/02_Responsible_AI.md#4-常見錯誤與詳解) |
+| Microsoft Foundry | [常見錯誤與詳解](knowledge/04_Microsoft_Foundry.md#7-常見錯誤與詳解) |
+| Text and Language | [常見錯誤與詳解](knowledge/05_Text_and_Language.md#6-常見錯誤與詳解) |
+| Speech | [常見錯誤與詳解](knowledge/06_Speech.md#7-常見錯誤與詳解) |
+| Computer Vision | [常見錯誤與詳解](knowledge/07_Computer_Vision.md#6-常見錯誤與詳解) |
+| Content Understanding | [常見錯誤與詳解](knowledge/08_Content_Understanding.md#9-常見錯誤與詳解) |
 
 ## 目錄用途
 
 | 目錄 | 內容 |
 |---|---|
-| `knowledge/` | 每個主要模組一份 canonical knowledge note |
-| `mistakes/` | 依模組集中管理的原始題目、選項分析與考點 |
+| `knowledge/` | 每個主要模組一份完整筆記，文章底部包含對應錯題與詳解 |
 | `assets/knowledge/` | 對知識有幫助的原始投影片／圖表副本 |
 | `assets/mistakes/` | 21 張原始題目截圖／補充截圖的逐檔副本，對應 19 題錯題記錄 |
 | `source/` | 不修改的 Notion export、PDF 與全部原始圖片 |
@@ -56,4 +55,4 @@
 | **Legacy exam-bank context** | 為理解舊題保留；不代表同名產品一定已退休 |
 | **NEEDS VERIFICATION** | 官方文件不足、互相衝突，或原始材料已缺損，未自行猜測 |
 
-錯題中的完整原理以 `knowledge/` 為準；`mistakes/` 只解釋該題為何對或錯。Microsoft 產品名稱、SDK 與 Preview 狀態會持續變動，後續更新應以 [current English AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901) 和英文 Microsoft Learn 為優先依據。
+Microsoft 產品名稱、SDK 與 Preview 狀態會持續變動，後續更新應以 [current English AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901) 和英文 Microsoft Learn 為優先依據。

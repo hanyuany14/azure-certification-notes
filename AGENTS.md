@@ -28,11 +28,10 @@ Maintain this repository for **Exam AI-901: Microsoft Azure AI Fundamentals**. T
   - `README.md`: public repository entry point for all certification notes.
   - `HACKMD_SYNC.md`: instructions for linking public notes to HackMD through GitHub Sync.
   - `ai-901/README.md`: AI-901 module overview.
-  - `ai-901/knowledge/00_Index.md`: quick navigation for all AI-901 knowledge modules and mistake notes.
+  - `ai-901/knowledge/00_Index.md`: quick navigation for all AI-901 knowledge modules and their integrated mistake sections.
   - `ai-901/knowledge/01_Exam_Guide.md`: exam process, preparation strategy, resource order, and clearly labeled personal exam experience.
   - `ai-901/source/`: immutable original exports, PDFs, and screenshots.
   - `ai-901/knowledge/02_Responsible_AI.md`, `03_AI_Models_and_Workloads.md`, `04_Microsoft_Foundry.md`, `05_Text_and_Language.md`, `06_Speech.md`, `07_Computer_Vision.md`, `08_Content_Understanding.md`, `09_Legacy_and_Adjacent_Topics.md`: the eight canonical module notes.
-  - `ai-901/mistakes/`: one grouped mistake file per module when source questions exist; do not create empty files.
   - `ai-901/assets/knowledge/`: study copies of useful knowledge images. `ai-901/assets/mistakes/`: every original question screenshot, preserved one-for-one.
 - Keep prompts, deployment, and Foundry SDK/client patterns within the Foundry module; include service-specific code patterns in their service modules.
 - Within Computer Vision, group Image Classification, Object Detection, OCR, Image Analysis, Azure Face, Domain-specific Models, multimodal vision, image generation, Current vs Legacy, and Common Confusions under headings, with verified scope/status labels.
@@ -42,7 +41,8 @@ Maintain this repository for **Exam AI-901: Microsoft Azure AI Fundamentals**. T
 - Preserve outdated/incorrect images and add an explicit correction immediately underneath. Keep provenance and avoid overwriting distinct images with the same export filename.
 
 ## 7. Mistake notes
-- Group questions in module files. Each question must include: original screenshot, tested concept, correct answer, detailed explanation, why every other option is wrong, question clue/keyword, link to the related knowledge heading, current Microsoft terminology, official source, and short exam takeaway.
+- Place each module's questions in a **Common Mistakes and Detailed Explanations** section near the bottom of its canonical knowledge file. Do not create separate mistake Markdown files.
+- Each question must include: original screenshot, tested concept, correct answer, detailed explanation, why every other option is wrong, question clue/keyword, current Microsoft terminology, official source, and short exam takeaway.
 - Explain legacy expected answers separately from current behavior. Mark missing evidence or unverified answers **NEEDS VERIFICATION** rather than inventing them.
 
 ## 8. Verification
@@ -52,7 +52,7 @@ Maintain this repository for **Exam AI-901: Microsoft Azure AI Fundamentals**. T
 ## 9. Original files
 - Never modify files inside `ai-901/source/`; treat it as immutable source material. Create all cleaned/reorganized notes outside it.
 - Existing exports also remain in `ai-901/raw notes/`; treat that directory as immutable. Originals have been copied into `ai-901/source/` with their structure and linked assets preserved.
-- Migration and factual refinement are authorized for `ai-901/knowledge/`, `ai-901/mistakes/`, `ai-901/assets/`, README files, and this repository map. Never rewrite the preserved originals.
+- Migration and factual refinement are authorized for `ai-901/knowledge/`, `ai-901/assets/`, README files, and this repository map. Never rewrite the preserved originals.
 
 ## 10. Maintenance behavior
 - Before adding content: identify its existing module, check whether the concept already exists, update that module instead of adding unnecessary files, avoid duplicate explanations, and update affected comparison tables.
