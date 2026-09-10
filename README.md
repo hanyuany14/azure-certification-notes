@@ -6,7 +6,7 @@
 
 | Certification | 說明 | 快速入口 |
 |---|---|---|
-| **AI-901: Microsoft Azure AI Fundamentals** | AI 概念、Microsoft Foundry、Language、Speech、Vision、Content Understanding 與錯題整理 | [開始閱讀](ai-901/knowledge/00_Index.md) |
+| **AI-901: Microsoft Azure AI Fundamentals** | AI 概念、Microsoft Foundry、Language、Speech、Vision、Content Understanding 與錯題整理 | [開始閱讀](ai-901/knowledge/00_README.md) |
 
 筆記會持續更新。內容以英文 Microsoft Learn 與最新 Study Guide 為主要依據；舊題庫知識會另外標示 **Legacy exam-bank context**。
 

@@ -27,11 +27,10 @@ Maintain this repository for **Exam AI-901: Microsoft Azure AI Fundamentals**. T
 - Current layout:
   - `README.md`: public repository entry point for all certification notes.
   - `HACKMD_SYNC.md`: instructions for linking public notes to HackMD through GitHub Sync.
-  - `ai-901/README.md`: AI-901 module overview.
-  - `ai-901/knowledge/00_Index.md`: quick navigation for all AI-901 knowledge modules and their integrated mistake sections.
+  - `ai-901/knowledge/00_README.md`: AI-901 entry page and quick navigation for all knowledge modules.
   - `ai-901/knowledge/01_Exam_Guide.md`: exam process, preparation strategy, resource order, and clearly labeled personal exam experience.
   - `ai-901/source/`: immutable original exports, PDFs, and screenshots.
-  - `ai-901/knowledge/02_Responsible_AI.md`, `03_AI_Models_and_Workloads.md`, `04_Microsoft_Foundry.md`, `05_Text_and_Language.md`, `06_Speech.md`, `07_Computer_Vision.md`, `08_Content_Understanding.md`, `09_Legacy_and_Adjacent_Topics.md`: the eight canonical module notes.
+  - `ai-901/knowledge/02_Responsible_AI.md`, `03_AI_Models_and_Workloads.md`, `04_Microsoft_Foundry.md`, `05_Text_and_Language.md`, `06_Speech.md`, `07_Computer_Vision.md`, `08_Content_Understanding.md`, `09_Azure_Fundamentals.md`: the eight canonical module notes.
   - `ai-901/assets/knowledge/`: study copies of useful knowledge images. `ai-901/assets/mistakes/`: every original question screenshot, preserved one-for-one.
 - Keep prompts, deployment, and Foundry SDK/client patterns within the Foundry module; include service-specific code patterns in their service modules.
 - Within Computer Vision, group Image Classification, Object Detection, OCR, Image Analysis, Azure Face, Domain-specific Models, multimodal vision, image generation, Current vs Legacy, and Common Confusions under headings, with verified scope/status labels.

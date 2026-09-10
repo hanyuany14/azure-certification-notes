@@ -18,7 +18,7 @@ Azure Certification Notes/
     ├── 06 Speech
     ├── 07 Computer Vision
     ├── 08 Content Understanding
-    └── 09 Legacy and Adjacent Topics
+    └── 09 Azure Fundamentals
 ```
 
 ## 第一次連結
@@ -27,7 +27,7 @@ Azure Certification Notes/
 2. 在 HackMD 建立一篇空白 note。
 3. 開啟 **Versions and GitHub Sync**。
 4. 選擇 **Pull from GitHub**。
-5. 選擇 repository、`main` branch，以及對應檔案，例如 `ai-901/knowledge/00_Index.md`。
+5. 選擇 repository、`main` branch，以及對應檔案，例如 `ai-901/knowledge/00_README.md`。
 6. 對需要公開的每篇知識筆記重複一次，再放進 HackMD 的 `AI-901` 資料夾。
 7. 將 note 的閱讀權限設為公開；若希望出現在 HackMD 公開頁面，再使用 Publish。
 
