@@ -61,7 +61,7 @@ AI-901 英文考綱自 **2026-04-15** 起分為兩大部分：
 
 ## 4. Foundry Portal 考前操作
 
-至少實際點過一次以下區域，建立畫面與功能的連結：
+考前建議把 Foundry Portal 的主要區域和功能都操作一次，知道各功能大約位於哪裡即可。
 
 ```text
 Discover → Model catalog / Model leaderboard → 找模型、比較模型
@@ -70,12 +70,11 @@ Operate  → Tracing / Compliance / fleet       → 觀察與治理營運狀態
 Manage   → Quota / Project details / Connections
 ```
 
-- **Model catalog**：探索模型與 model card。
-- **Model leaderboard**：依 quality、safety、cost、throughput 等 benchmark 比較模型；目前為 **Preview**。
-- **Evaluation**：對模型、app 或 agent 執行評估。
-- **Evaluator**：評分規則，例如 relevance、groundedness、coherence、fluency 或 agent tool-use metrics。
-- **Agent name**：既有 agent 的識別值，不是 model deployment name。
-- **Connection**：Project 連到 Azure OpenAI、Storage、AI Search 等外部資源的設定。
+- 在 **Build** 中實際建立一次 Agent，查看 instructions、model 與 Tools 如何設定。
+- 看過如何透過 **REST API、SDK 或程式碼範例**呼叫已建立的 Agent。
+- 每個頁面和功能都點過一次即可；遇到不熟的項目，可查看旁邊的 **`?` icon** 說明，或直接詢問 Portal 中的 AI。
+
+> **準備重點：**不必背熟整個 Portal，但要看過功能名稱、所在位置和基本操作流程。
 
 ## 5. Speech 關鍵字
 
@@ -92,6 +91,9 @@ Manage   → Quota / Project details / Connections
 ## 6. Practice Assessment 練習方式
 
 Practice Assessment 可免費重做，並提供答案理由與學習連結；它反映題目風格，但不等於正式題目、題數或完整難度。
+
+這裡可以找到：https://learn.microsoft.com/en-us/credentials/certifications/practice-assessments-for-microsoft-certifications
+
 
 ```text
 做 Practice Assessment
