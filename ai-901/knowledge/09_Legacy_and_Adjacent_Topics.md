@@ -31,7 +31,7 @@
 | **Endpoint** | 呼叫已部署模型的介面 | 接收推論要求 | 推論輸入 | 預測結果 | inference interface |
 | **Pipeline** | 將多個工作步驟串成流程 | 重複執行資料處理、訓練、評估 | 步驟與相依關係 | 多步驟工作結果 | workflow |
 
-例如：在 `house-price-workspace` 內，以 Datastore 指向 Blob Storage；將房屋資料建立為 Data Asset，透過 Compute 執行訓練 Job，把不同演算法的 Jobs 放進同一個 Experiment 比較，再註冊模型並部署至 Endpoint。模型訓練與評估原理見 [02 模型與工作負載](02_AI_Models_and_Workloads.md)。
+例如：在 `house-price-workspace` 內，以 Datastore 指向 Blob Storage；將房屋資料建立為 Data Asset，透過 Compute 執行訓練 Job，把不同演算法的 Jobs 放進同一個 Experiment 比較，再註冊模型並部署至 Endpoint。模型訓練與評估原理見 [03 模型與工作負載](03_AI_Models_and_Workloads.md)。
 
 **原文缺損：**匯出筆記中另有一段 Datastore 說明出現缺字，只剩 Blob Storage、Data Lake、SQL Database 等片段。本節以現行文件重新說明 Datastore；**SQL Database 在該段所指的 SDK 版本與連線方式：NEEDS VERIFICATION**，不把殘句補成現行 v2 支援清單。
 
@@ -101,10 +101,10 @@ Designer 是建構流程的方式，AutoML 是自動搜尋模型的能力；兩�
 | **Web Chat** | 嵌入網站的聊天 UI | 官網中的客服聊天視窗 | 是介面，不是理解意圖的模型 |
 | **Direct Line** | 讓自訂 client 與 Bot 通訊的 API | 手機 App 自製 UI → 同一個 Bot | 自訂介面的連接方式 |
 | **Language Understanding Intelligent Service (LUIS)** | 舊版 NLU 服務 | Utterance → Intent + Entities | **Retired：2026-03-31**；移轉脈絡見 CLU |
-| **Conversational Language Understanding (CLU)** | 判斷對話意圖、擷取實體 | 「訂明天到台北的車票」→ 意圖與欄位 | LUIS 後續移轉功能，目前為 **Retiring**；詳見 [04](04_Text_and_Language.md) |
+| **Conversational Language Understanding (CLU)** | 判斷對話意圖、擷取實體 | 「訂明天到台北的車票」→ 意圖與欄位 | LUIS 後續移轉功能，目前為 **Retiring**；詳見 [05](05_Text_and_Language.md) |
 | **Azure AI Content Moderator** | 舊版不當內容審核服務 | Text / Image / Video → 內容標記 | **Deprecated / Retiring**；成人、挑逗、冒犯文字、自訂禁止詞等舊題庫情境 |
 
-Content Moderator 的輸出供應用程式決定封鎖、標記或人工處理，不代表所有被標記內容都由服務自動刪除。現行 **Azure AI Content Safety** 的能力與負責任 AI 控制見 [01](01_Responsible_AI.md)，不能假設它與舊版服務的每種輸入、輸出及審核流程一一相同。
+Content Moderator 的輸出供應用程式決定封鎖、標記或人工處理，不代表所有被標記內容都由服務自動刪除。現行 **Azure AI Content Safety** 的能力與負責任 AI 控制見 [02](02_Responsible_AI.md)，不能假設它與舊版服務的每種輸入、輸出及審核流程一一相同。
 
 ### 2.7 Knowledge Mining 與 AI Enrichment
 
@@ -115,7 +115,7 @@ Content Moderator 的輸出供應用程式決定封鎖、標記或人工處理�
 | **Skillset** | 描述要執行的 enrichment skills 與資料流 | OCR 後再做文字分析 |
 | **Indexer** | 從支援的資料來源擷取並更新索引 | 將 Blob Storage 文件加入 Search Index |
 
-Knowledge Mining 是解決方案概念，不是已退休的服務名稱。**Azure AI Search** 的 Index、全文／向量／混合搜尋、Semantic Ranker 與 Agent 檢索工具集中在 [03 Microsoft Foundry](03_Microsoft_Foundry.md)。
+Knowledge Mining 是解決方案概念，不是已退休的服務名稱。**Azure AI Search** 的 Index、全文／向量／混合搜尋、Semantic Ranker 與 Agent 檢索工具集中在 [04 Microsoft Foundry](04_Microsoft_Foundry.md)。
 
 ## 3. How It Works
 
@@ -128,12 +128,12 @@ Knowledge Mining 是解決方案概念，不是已退休的服務名稱。**Azur
 
 ## 4. Important API / SDK Patterns
 
-本模組以辨認用途為主，不要求背誦周邊服務的管理程式。Foundry 實作集中在 [03](03_Microsoft_Foundry.md)。
+本模組以辨認用途為主，不要求背誦周邊服務的管理程式。Foundry 實作集中在 [04](04_Microsoft_Foundry.md)。
 
 | Pattern / Parameter | 要理解的用途 | 版本／限制 |
 |---|---|---|
 | **MLClient**，`azure.ai.ml` | Azure Machine Learning SDK v2 的資源與工作管理 client | 不等於 Foundry 的 `AIProjectClient` |
-| **AIProjectClient**，`azure.ai.projects` | 連接 Foundry project 與相關開發功能 | 請依 [03](03_Microsoft_Foundry.md) 的版本與範例使用 |
+| **AIProjectClient**，`azure.ai.projects` | 連接 Foundry project 與相關開發功能 | 請依 [04](04_Microsoft_Foundry.md) 的版本與範例使用 |
 | `azureml://datastores/<datastore-name>/paths/<path-on-datastore>/` | 在 AML 指向 Datastore 內的資料路徑 | 是資料 URI，不是模型推論 endpoint |
 | **Token + RBAC** | 身分驗證後，以角色及 scope 控制授權 | 不要把 Key Vault 名稱或 endpoint 當成憑證 |
 | 舊 `AutoMLConfig.validation_size` | 控制驗證資料比例，例如 `0.2` | **SDK v1 / Legacy**；不是所有任務都支援 |

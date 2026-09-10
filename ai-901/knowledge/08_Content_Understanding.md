@@ -10,7 +10,7 @@
 | Main exam workloads | Content extraction、field extraction、classification、document processing、audio/video analysis |
 | Primary Microsoft products | Azure Content Understanding、Microsoft Foundry；比較 Azure Document Intelligence、Azure Vision、Azure Speech |
 
-核對日期：**2026-09-06**。本模組對應現行考綱的 **documents/forms、images、audio/video extraction** 與 **lightweight client**。以 GA 核心概念與題目中的 analyzer 為主；新 Preview 的進階功能只在有名稱或參數差異時提示。[Current AI-901 scope](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)
+核對日期：**2026-09-10**。本模組對應現行考綱的 **documents/forms、images、audio/video extraction** 與 **lightweight client**。以 GA 核心概念與題目中的 analyzer 為主；新 Preview 的進階功能只在有名稱或參數差異時提示。[Current AI-901 scope](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)
 
 ## 2. Core Concepts
 
@@ -43,14 +43,16 @@
 
 ### 2.2 四種輸入，對應不同基礎內容
 
-| Modality | Content extraction | Field extraction 例子 | 適合的應用 |
+| Modality | Base / common prebuilt analyzer | 核心輸出 | 適合的應用 |
 |---|---|---|---|
-| **Document** | Text、layout、tables、sections | Invoice number、vendor、date、total、line items | 發票與合約自動化 |
-| **Image** | 圖像內容與可用文字資訊 | 圖表摘要、產品特徵等自訂欄位 | 資產搜尋、圖像資訊整理 |
-| **Audio** | Transcript、speaker separation、timestamps | Summary、sentiment、topics、people、companies | 通話後分析、Podcast 整理 |
-| **Video** | Transcript、shots、key frames、timing | Scene description、categories、自訂場景資訊 | 影片索引、片段檢索、RAG |
+| **Document** | `prebuilt-document`；`prebuilt-read` / `prebuilt-layout`；`prebuilt-invoice` | Text、layout、tables、invoice fields、line items | 文件 OCR、發票與合約自動化 |
+| **Image** | `prebuilt-image`；`prebuilt-imageSearch` | 圖像描述、可用文字、圖表摘要或自訂 fields | 資產搜尋、圖像資訊整理 |
+| **Audio** | `prebuilt-audio`；`prebuilt-audioSearch`；`prebuilt-callCenter` | Transcript、speaker、timestamps、summary 或 call-center fields | 通話後分析、Podcast 整理 |
+| **Video** | `prebuilt-video`；`prebuilt-videoSearch` | Transcript、shots、key frames、segments 或自訂 fields | 影片索引、片段檢索、RAG |
 
-只有文字轉錄與播放需求時，先看 [Azure Speech](05_Speech.md)；要把文件或錄音按 schema 轉成業務資料時，才是本模組的重點。
+> **Analyzer 階層：**`prebuilt-document`、`prebuilt-image`、`prebuilt-audio`、`prebuilt-video` 是建立 custom analyzer 時可繼承的四個 **base analyzers**；`*Search` 是針對 RAG／搜尋內容準備的 analyzer；invoice、call center 等名稱則代表特定情境。題目問「處理哪種 modality」與「要哪種業務輸出」時要一起判斷。
+
+只有文字轉錄與播放需求時，先看 [Azure Speech](06_Speech.md)；要把文件或錄音按 schema 轉成業務資料時，才是本模組的重點。
 
 ### 2.3 Schema：欄位意義、型別與 relationships
 
@@ -277,8 +279,8 @@ for content in result.contents or []:
 | **OCR / Read** | 影像文字 → recognized text | 只需要把印刷/手寫字讀出來 |
 | **Azure Document Intelligence** | 文件 → text、layout、tables、key-value pairs 或 prebuilt/custom model fields | 題目明確指定該服務或文件模型流程 |
 | **Azure Content Understanding** | Document / Image / Audio / Video → content + schema-defined fields | 多模態內容或題目指定 analyzer / fieldSchema |
-| **Azure Speech** | 語音 ↔ 文字；語音相關功能 | 專門 recognition / synthesis；見 [Speech](05_Speech.md) |
-| **Vision-capable generative model** | 圖片 + prompt → 回答 | 互動式看圖問答；見 [Computer Vision](06_Computer_Vision.md) |
+| **Azure Speech** | 語音 ↔ 文字；語音相關功能 | 專門 recognition / synthesis；見 [Speech](06_Speech.md) |
+| **Vision-capable generative model** | 圖片 + prompt → 回答 | 互動式看圖問答；見 [Computer Vision](07_Computer_Vision.md) |
 
 **原筆記更正：**「表格 / key-value pairs → 一定選 Document Intelligence」忽略了 Content Understanding。表格是輸出需求，還需看指定服務與 schema；OCR 也可能是文件處理流程的一部分，不能說文件理解完全不用 OCR。[Document Intelligence overview](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/overview)、[Content Understanding overview](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/overview)
 
@@ -332,7 +334,7 @@ for content in result.contents or []:
 
 ## 9. Official Sources
 
-核對日期：**2026-09-06**。下列以 English Microsoft Learn 為主；頁面中的 Preview 提示與舊示例需一起讀。
+核對日期：**2026-09-10**。下列以 English Microsoft Learn 為主；頁面中的 Preview 提示與舊示例需一起讀。
 
 - [AI-901 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901)：內容擷取與多模態範圍。
 - [Content Understanding overview](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/overview)：服務與處理輸入。
