@@ -5,3 +5,7 @@
 .obsidian/workspace.json
 __pycache__/
 *.py[cod]
+
+# Local repository instructions and publishing notes
+AGENTS.md
+HACKMD_SYNC.md
