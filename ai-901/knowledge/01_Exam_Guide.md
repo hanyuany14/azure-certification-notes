@@ -1,8 +1,6 @@
 # AI-901 考前須知｜流程、方向與練習方式
 
-這份筆記用於考前快速閱讀。**Official** 是 Microsoft 公開規格；**Personal experience** 是單次考試心得，題數與出題比例可能因場次而異。
-
-## 1. 官方考試範圍
+這份筆記用於考前快速閱讀。
 
 AI-901 英文考綱自 **2026-04-15** 起分為兩大部分：
 
@@ -13,7 +11,7 @@ AI-901 英文考綱自 **2026-04-15** 起分為兩大部分：
 
 官方提醒考生要熟悉 Python 基本語法，以及 REST APIs、SDKs 和 CLIs。多數題目以 GA 功能為主，也可能包含常用 Preview 功能。
 
-https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901
+建議可以先閱讀一下官方指南：https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901
 
 ## 2. 考試時間與題型
 
@@ -25,7 +23,14 @@ https://learn.microsoft.com/en-us/credentials/certifications/resources/study-gui
 | **常見題型** | 單選、複選、下拉填空、drag-and-drop、程式碼欄位／method 選擇 |
 | **Microsoft Learn** | Fundamentals 考試期間不能開啟 Microsoft Learn |
 
-> **程式題的重點：**通常是讀懂 client、method、parameter 與 input/output，不是從零寫出完整應用程式。例如文字加圖片的 multimodal input，先辨認 `input_text` 與 `input_image`；不要只背程式碼位置。
+> 啾啾筆記：通常 code 題目是讀懂 client、method、parameter 與 input/output，不是從零寫出完整應用程式。例如文字加圖片的 multimodal input，先辨認 `input_text` 與 `input_image`；不需要硬背程式碼喔～
+
+### 答題策略
+
+1. **選擇最直接的答案：**有些選項看起來都能達成需求，但單選題要選最直接、最符合題目主要目標的方法，不必加入題目沒有要求的額外功能。
+2. **從情境中找關鍵字：**考試常以「工程師或公司要建立某種 app」描述需求。先找出題目的 **input、output、動作與限制**，再對應 Azure AI 服務。例如 `transcribe` 對應 Speech to Text，`sentiment` 對應 Azure Language，`structured fields` 則優先想到 Content Understanding。
+
+> **快速記法：**先判斷「輸入什麼、要產出什麼」，再選最直接完成需求的服務。
 
 ## 3. 出題方向｜Personal experience
 
@@ -53,7 +58,6 @@ https://learn.microsoft.com/en-us/credentials/certifications/resources/study-gui
 | 搜尋企業文件與 index | Azure AI Search；基礎詞彙見 [Foundry](04_Microsoft_Foundry.md#search-vocabulary把資料變成可檢索內容) |
 | 依 prompt 建立新圖片 | Image-generation model |
 
-**單選題原則：**選最直接完成題目目標的方法。若要控制角色、語氣或回答規則，優先選 **prompt / instructions**；`temperature` 主要調整輸出的隨機性，不是設定角色的主要工具。
 
 ## 4. Foundry Portal 考前操作
 
