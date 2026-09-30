@@ -90,9 +90,33 @@ Azure AI Content Safety 的四大核心類別：
 | **Groundedness detection** | LLM 回答是否有檢索資料支撐（幻覺） | **Preview** | RAG 架構的**輸出品質**評估 |
 | **Protected material detection** | 是否產生受版權保護的文字或程式碼 | Current | 版權侵權防護、開源授權檢查 |
 | **Task adherence** | Agent 的工具使用是否偏離、非預期或過早 | **Preview** | Agent 行為治理 |
-| **Analyze text / Analyze image** | 四大危害類別分類 | Current | 一般內容審查 |
+| **Analyze text / Image moderation（Analyze image）** | 四大危害類別分類 | Current | 一般內容審查，詳見下方 |
 
 > **啾啾筆記：** 這幾個很容易在同一題裡當選項互相干擾。記住分工：**Groundedness 管「輸出對不對」，Prompt Shields 管「輸入安不安全」**。輸入端的攻擊不能用輸出端的評估器去擋喔～
+
+### Image moderation（Analyze Image）是什麼
+
+微軟沒有另外取名叫「Image Moderation」的獨立服務——這就是 Content Safety 的 **Analyze Image** 操作（Foundry 入口顯示為 **Moderate image content**），跟 Analyze Text 是同一套引擎，只是換成影像輸入。題目常把它當成「圖片安全防護」的預設答案，但它能做的事其實很侷限：
+
+| 項目 | 內容 |
+|---|---|
+| **偵測什麼** | 固定的**四大危害類別**：Hate、SelfHarm、Sexual、Violence（**不可自訂**） |
+| **嚴重度輸出** | 只支援 `outputType=FourSeverityLevels`（**0/2/4/6**）；文字版另有 8 級可選，影像沒有 |
+| **看不看得懂圖片裡的文字** | **看不懂**。它評的是視覺內容本身，**不分析 OCR 出來的文字語意** |
+| **輸入限制** | Base64 或 Blob URL；影像 **50×50 px 至 7200×7200 px**、**檔案上限 4 MB**；動態圖只取**第一幀**分析 |
+| **能不能認企業自訂符號／浮水印** | **不能**。只認四大通用危害，企業專屬規則要靠 custom categories |
+
+### 三個容易混淆的「圖片安全」選項
+
+Q07、Q18 都在考這組分工，遇到「圖片＋安全」情境時先問自己「威脅是視覺內容、文字語意、還是企業專屬規則？」：
+
+| 情境 | 應該選 | 為什麼不是另外兩個 |
+|---|---|---|
+| 圖片本身含色情／暴力／血腥等**視覺危害** | **Image moderation（Analyze Image）** | Prompt Shields 只看文字指令攻擊；custom categories 是給企業自訂危害用的，通用危害不需要客製 |
+| 圖片裡的**文字**試圖竄改 agent 指令（OCR 注入） | **Prompt Shields** | Image moderation 偵測不到「文字語意」，只評視覺內容本身 |
+| 偵測企業專屬 **logo／浮水印／禁止符號** | **Custom categories (rapid)** | Image moderation 的四大類別是通用的，認不出企業專屬視覺規則 |
+
+> **啾啾筆記：** 「圖片裡看得到的髒東西」→ image moderation；「圖片裡藏的文字指令」→ Prompt Shields；「圖片裡的企業專屬規則」→ custom categories。三選一先問威脅長在哪裡喔～
 
 ## 6. 評估、稽核與人工監督
 
@@ -256,6 +280,7 @@ Azure AI Content Safety 的四大核心類別：
 - **Text 有完整 0–7；Image 只有 0/2/4/6。**
 - **輸入端攻擊 → Prompt Shields；輸出端幻覺 → Groundedness。**
 - **企業專屬 logo／浮水印 → Custom categories，不是 built-in moderation。**
+- **Image moderation 只認四大通用危害，看不懂圖片裡的文字語意，也認不出自訂符號。**
 - **多來源影像 → pre-storage 驗證，不能只靠生成端過濾。**
 - **高風險擋掉＋不確定留人工 → Reject detected; triage uncertain。**
 - **稽核關鍵字（audit trail、verify source）→ provenance / lineage metadata。**
@@ -268,6 +293,7 @@ Azure AI Content Safety 的四大核心類別：
 - [AI-103 Study Guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-103)
 - [What is Azure AI Content Safety?](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview)
 - [Harm categories in Azure AI Content Safety](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/harm-categories)
+- [Quickstart: Analyze image content](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/quickstart-image)
 - [Prompt Shields](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/jailbreak-detection)
 - [Custom categories](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/custom-categories)
 - [Groundedness detection](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/groundedness)
