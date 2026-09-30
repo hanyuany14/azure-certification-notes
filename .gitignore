@@ -9,3 +9,6 @@ __pycache__/
 # Local repository instructions and publishing notes
 AGENTS.md
 HACKMD_SYNC.md
+
+# Immutable original exports (kept local only)
+ai-103/raw_files/

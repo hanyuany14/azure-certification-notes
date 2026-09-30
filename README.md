@@ -7,6 +7,9 @@
 | Certification | 說明 | 快速入口 |
 |---|---|---|
 | **AI-901: Microsoft Azure AI Fundamentals** | AI 概念、Microsoft Foundry、Language、Speech、Vision、Content Understanding 與錯題整理 | [開始閱讀](ai-901/knowledge/00_README.md) |
+| **AI-103: Developing AI Apps and Agents on Azure** | 服務選型與治理、RAG 與 Agent、視覺生成、語音、Azure AI Search 與 Content Understanding，以及錯題整理 | [開始閱讀](ai-103/knowledge/00_README.md) |
+
+AI-901 是 Fundamentals，AI-103 是 Associate。沒有 Azure 經驗的話，建議先讀 AI-901 建立概念，再進 AI-103 看實作與設定。
 
 筆記會持續更新。內容以英文 Microsoft Learn 與最新 Study Guide 為主要依據；舊題庫知識會另外標示 **Legacy exam-bank context**。
 
